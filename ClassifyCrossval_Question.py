@@ -38,8 +38,8 @@ selectedParameters = [
 	(6 , 'distance'),
 	(7 , 'averageSpeed'),
 	# (8 , 'maxSpeed'), #
-	# (9 , 'thinkingTime'), #
-	# (10 , 'answeringTime'), #
+	(9 , 'thinkingTime'), #
+	(10 , 'answeringTime'), #
 	# (11, 'totalStopTime'), #
 	(12, 'maxStopTime '),
 	# (13, 'totalDDIntervalTime '), #

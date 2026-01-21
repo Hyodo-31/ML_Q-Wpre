@@ -40,9 +40,9 @@ selectedParameters = [
 	# (8 , 'maxSpeed'), #
 	(9 , 'thinkingTime'), #
 	(10 , 'answeringTime'), #
-	# (11, 'totalStopTime'), #
+	(11, 'totalStopTime'), #
 	(12, 'maxStopTime '),
-	# (13, 'totalDDIntervalTime '), #
+	(13, 'totalDDIntervalTime '), #
 	(14, 'maxDDIntervalTime '),
 	(15, 'maxDDTime'),
 	# (16, 'minDDTime'), #
@@ -118,6 +118,8 @@ for p in range(len(labels)):	#labelsとfeaturesに混ぜて入れたデータを
 		features3.append(features[p])
 		counter.append(number)
 		number += 1
+  
+random.seed(42)
  
 for q in range(10):	#10回繰り返す
 	#print('機械学習: ' + str(q+1) + '回目')
@@ -168,8 +170,9 @@ for q in range(10):	#10回繰り返す
 
 	# n交差できるように標本を分割
 	n_folds = 10
-	#skf = cross_validation.StratifiedKFold(labels, n_folds=n_folds, random_state=0) # 後で，このskfというものをfor ... inで辿っていくことで，うまく交差検定できる．
-	skf = model_selection.StratifiedKFold(n_splits=n_folds).split(features,labels)
+	skf = model_selection.StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=42).split(features,labels)
+    # 後で，このskfというものをfor ... inで辿っていくことで，うまく交差検定できる．
+	#skf = model_selection.StratifiedKFold(n_splits=n_folds).split(features,labels) 最近まで使ってたやつ
 	# 正解率と，迷いなし，迷いありそれぞれの適合率，再現率，F値の総和がここに格納される．
 	sum_accuracy = 0
 	sum_precision_no = 0
@@ -181,6 +184,8 @@ for q in range(10):	#10回繰り返す
 	# 特徴量ごとの重要度の総和が，このnumpy形式の配列に格納される．
 	# 特徴量の個数（特徴ベクトルの要素数）だけ，0が並んだ状態で，配列が初期化されている．
 	sum_feature_importance = numpy.array([0]*len(features[0]))
+ # ★追加：Fold数をカウント変数を初期化
+	fold_count = 1
 
 
 	# 交差検定のために分割された学習データ，実験データを使って，実際に，学習，分類していく．
@@ -211,6 +216,12 @@ for q in range(10):	#10回繰り返す
 		# sには，サンプルの個数が入っているけど，今回は使わない．
 		# p, r, fは，3つとも，配列．pは，[迷いなしの場合の適合率, 迷いありの適合率]の2要素からなる配列．再現率，f値も同様．
 		p, r, f, s = metrics.precision_recall_fscore_support(labels_test, labels_pred)
+  # ★追加：各Foldの結果をコンソールに表示
+		print(f"  Fold {fold_count}: Accuracy={accuracy:.3f}, "
+		      f"No [P={p[0]:.3f}, R={r[0]:.3f}, F={f[0]:.3f}], "
+		      f"Yes [P={p[1]:.3f}, R={r[1]:.3f}, F={f[1]:.3f}]")
+		fold_count += 1
+		# --------------------------------------------------
 		sum_precision_no  += p[0]
 		sum_recall_no     += r[0]
 		sum_f_measure_no  += f[0]
